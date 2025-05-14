@@ -1,0 +1,131 @@
+﻿<Window x:Class="HRM.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HRM"
+        mc:Ignorable="d"
+        Title="Employee Management" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Buton principal pentru a afișa câmpurile -->
+        <Button x:Name="ShowAddButton" 
+                Content="Adaugă Persoană" 
+                Click="ShowAddButton_Click"
+                HorizontalAlignment="Left"
+                Width="120"
+                Grid.Row="0"/>
+
+        <!-- Undo Button - Moved to top right and made smaller -->
+        <Button Content="Undo" 
+                Click="Undo_Click" 
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Width="60"
+                Margin="0,0,0,10"
+                Grid.Row="0"/>
+
+        <!-- Panel cu câmpurile de input (inițial ascuns) -->
+        <StackPanel x:Name="InputPanel" 
+            Orientation="Horizontal" 
+            Margin="0,10,0,10"
+            Grid.Row="1"
+            Visibility="Collapsed">
+            <!-- Name Field -->
+            <StackPanel Orientation="Vertical" Width="120" Margin="0,0,10,0">
+                <TextBlock Text="Nume Angajat" FontWeight="Bold"/>
+                <TextBox x:Name="NameTextBox" 
+                 ToolTip="Introduceți numele angajatului"
+                 Text="Introdu nume"
+                 Foreground="Gray"
+                 GotFocus="NameTextBox_GotFocus"
+                 LostFocus="NameTextBox_LostFocus"/>
+            </StackPanel>
+
+            <!-- Role Field -->
+            <StackPanel Orientation="Vertical" Width="120" Margin="0,0,10,0">
+                <TextBlock Text="Rol" FontWeight="Bold"/>
+                <ComboBox x:Name="RoleComboBox"
+                 ToolTip="Selectați rolul"
+                 SelectedIndex="-1"
+                 Text="Introdu nume">
+                    <ComboBoxItem Content="-- Selectează rol --" IsEnabled="False"/>
+                    <ComboBoxItem Content="HR"/>
+                    <ComboBoxItem Content="Manager"/>
+                    <ComboBoxItem Content="Developer"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Team Field -->
+            <StackPanel Orientation="Vertical" Width="120" Margin="0,0,10,0">
+                <TextBlock Text="Echipă" FontWeight="Bold"/>
+                <ComboBox x:Name="TeamComboBox"
+                 ToolTip="Selectați echipa"
+                 SelectedIndex="-1">
+                    <ComboBoxItem Content="-- Selectează echipă --" IsEnabled="False"/>
+                    <ComboBoxItem Content="Front"/>
+                    <ComboBoxItem Content="Back"/>
+                    <ComboBoxItem Content="Tester"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="0,0,10,0">
+                <Button Content="Adaugă" 
+                Click="Add_Click" 
+                Margin="0,0,0,5"
+                Width="80"/>
+                <Button Content="Anulează" 
+                Click="Cancel_Click"
+                Width="80"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Panel pentru butonul de ștergere (inițial ascuns) -->
+        <StackPanel x:Name="DeletePanel"
+            Orientation="Horizontal"
+            Margin="0,10,0,10"
+            Grid.Row="1"
+            Visibility="Collapsed">
+            <TextBlock Text="Alege Opțiunea" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <Button Content="Editează"
+            x:Name="EditButton"
+            Click="Edit_Click"
+            Margin="0,0,10,0"/>
+            <Button Content="Șterge"
+            Click="Delete_Click"
+            Margin="0,0,10,0"/>
+            <Button Content="Anulează"
+            Click="CancelDelete_Click"/>
+        </StackPanel>
+
+        <!-- Lista angajaților -->
+        <DataGrid x:Name="EmployeeDataGrid" 
+          Grid.Row="2"
+          AutoGenerateColumns="False"
+          CanUserAddRows="False"
+          SelectionMode="Single"
+          IsReadOnly="True"
+          SelectionChanged="EmployeeDataGrid_SelectionChanged"
+          Margin="0,10,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
+                <DataGridTextColumn Header="Team" Binding="{Binding Team}" Width="*"/>
+                <DataGridTextColumn Header="Hire Date" Binding="{Binding HireDate, StringFormat=d}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel x:Name="ToastContainer"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="10"
+            Orientation="Vertical"
+            Panel.ZIndex="999"
+            IsHitTestVisible="False" />
+    </Grid>
+</Window>
