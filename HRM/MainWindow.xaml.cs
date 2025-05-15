@@ -13,7 +13,7 @@ namespace HRM
 {
     public partial class MainWindow : Window, INotificationObserver
     {
-        private IEmployeeServices _service = new EmployeeAppService();
+        private IEmployeeServices _service = new EmployeeAppService(new EmployeeRepositoryAdapter());
         private ObservableCollection<Employee> _employeeList;
         private Employee _selectedEmployeeForEdit;
         private readonly CommandInvoker _commandInvoker = new CommandInvoker();

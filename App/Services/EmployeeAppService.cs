@@ -13,38 +13,30 @@ using System.Collections.ObjectModel;
 
 namespace App.Services
 {
-    public class EmployeeAppService: IEmployeeServices
+    public class EmployeeAppService : IEmployeeServices
     {
-        private readonly EmployeeRepository _repo;
+        private readonly IEmployeeRepository _repo;
         private readonly List<Employee> _employees;
-        private readonly List<IEmployeeObserver> _observers = new();
+        private readonly EmployeeBuilderService _builderService;
+        private readonly EmployeeNotifierService _notifier;
 
-
-        public EmployeeAppService()
+        public EmployeeAppService(IEmployeeRepository repo)
         {
-            _repo = EmployeeRepository.Instance;
+            _repo = repo;
             _employees = _repo.LoadAll();
+            _builderService = new EmployeeBuilderService();
+            _notifier = new EmployeeNotifierService();
         }
 
-        public List<Employee> GetEmployees()
-        {
-            return _employees;
-        }
+        public List<Employee> GetEmployees() => _employees;
 
         public void AddEmployee(string name, string role, string team)
         {
-            var builder = new EmployeeBuilder();
-            builder.SetName(name);
-            builder.SetRole(role);
-            builder.SetTeam(team);
-            builder.SetHireDate(DateTime.Now);
-
-            var employee = builder.Build();
+            var employee = _builderService.BuildEmployee(name, role, team);
             _employees.Add(employee);
             _repo.SaveAll(_employees);
 
-            NotifyObservers("Add", employee);
-
+            _notifier.NotifyObservers("Add", employee);
             NotificationService.Instance.Notify("Angajat adăugat cu succes");
         }
 
@@ -53,47 +45,33 @@ namespace App.Services
             _employees.Remove(employee);
             _repo.SaveAll(_employees);
 
-            NotifyObservers("Remove", employee);
-
+            _notifier.NotifyObservers("Remove", employee);
             NotificationService.Instance.Notify("Angajat șters cu succes");
-
         }
 
         public void UpdateEmployee(Employee updatedEmployee)
         {
-            var index = _employees.FindIndex(emp => emp.HireDate == updatedEmployee.HireDate
-                && emp.Name == updatedEmployee.Name); // simplu identificator
+            var index = _employees.FindIndex(emp =>
+                emp.HireDate == updatedEmployee.HireDate &&
+                emp.Name == updatedEmployee.Name);
             if (index >= 0)
             {
                 _employees[index] = updatedEmployee;
                 _repo.SaveAll(_employees);
             }
 
-            NotifyObservers("Edit", updatedEmployee);
-
+            _notifier.NotifyObservers("Edit", updatedEmployee);
             NotificationService.Instance.Notify("Angajat editat cu succes");
         }
 
         public void RegisterObserver(IEmployeeObserver observer)
         {
-            if (!_observers.Contains(observer))
-                _observers.Add(observer);
+            _notifier.RegisterObserver(observer);
         }
 
         public void UnregisterObserver(IEmployeeObserver observer)
         {
-            if (_observers.Contains(observer))
-                _observers.Remove(observer);
+            _notifier.UnregisterObserver(observer);
         }
-
-        private void NotifyObservers(string action, Employee employee)
-        {
-            foreach (var observer in _observers)
-            {
-                observer.OnEmployeeChanged(action, employee);
-            }
-        }
-
-
     }
 }

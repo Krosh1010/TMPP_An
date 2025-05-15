@@ -11,7 +11,7 @@ namespace App.Commands
     public class AddEmployeeCommand : ICommand
     {
         private readonly IEmployeeServices _service;
-        private Employee _addedEmployee;
+        private Employee? _addedEmployee;
         // Accept employee details as parameters
         private readonly string _name;
         private readonly string _role;

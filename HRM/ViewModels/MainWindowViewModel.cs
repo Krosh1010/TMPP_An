@@ -9,7 +9,12 @@ using App.Services;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
-    private readonly IEmployeeServices _service = new EmployeeAppService();
+    private readonly IEmployeeServices _service;
+
+    public MainWindowViewModel(IEmployeeServices service)
+    {
+        _service = service;
+    }
 
     public void AddHR(string name, string role, string team)
     {
