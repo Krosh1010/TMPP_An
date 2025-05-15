@@ -8,12 +8,14 @@ using Domain.Entities;
 using Domain.Observers;
 namespace App.Abstraction
 {
-    public interface IEmployeeServices : IEmployeeObservable
+    public interface IEmployeeServices 
     {
-        List<Employee> GetEmployees();
+        List<Employee> GetEmployeesForUser(User currentUser);
         void AddEmployee(string name, string role, string team);
         void RemoveEmployee(Employee employee);
         void UpdateEmployee(Employee updatedEmployee);
+        void RegisterObserver(IEmployeeObserver observer);
+        void UnregisterObserver(IEmployeeObserver observer);
 
     }
 }

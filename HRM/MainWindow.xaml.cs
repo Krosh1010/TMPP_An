@@ -13,21 +13,36 @@ namespace HRM
 {
     public partial class MainWindow : Window, INotificationObserver
     {
-        private IEmployeeServices _service = new EmployeeAppService(new EmployeeRepositoryAdapter());
+        private IEmployeeServices _service;
         private ObservableCollection<Employee> _employeeList;
         private Employee _selectedEmployeeForEdit;
         private readonly CommandInvoker _commandInvoker = new CommandInvoker();
 
-        public MainWindow()
+        private User _currentUser;
+        public MainWindow(User user)
         {
             InitializeComponent();
-            _employeeList = new ObservableCollection<Employee>(_service.GetEmployees());
+            _currentUser = user;
+            _service = new EmployeeAppService(
+              new EmployeeRepositoryAdapter(),
+              new EmployeeBuilderService(),
+            new EmployeeNotifierService(),
+            new EmployeeAccessService(),
+            NotificationService.Instance
+    );
+            _employeeList = new ObservableCollection<Employee>(_service.GetEmployeesForUser(_currentUser));
             EmployeeDataGrid.ItemsSource = _employeeList;
             var logger = new EmployeeLogger();
             _service.RegisterObserver(logger);
             var uiUpdater = new EmployeeUIUpdater(_employeeList);
             _service.RegisterObserver(uiUpdater);
             NotificationService.Instance.Subscribe(this);
+
+            if (_currentUser.Role != "HR")
+        {
+        ShowAddButton.Visibility = Visibility.Collapsed;
+        UndoButton.Visibility = Visibility.Collapsed;
+        }
         }
 
         public void OnNotification(string message, bool isError = false)
@@ -74,7 +89,7 @@ namespace HRM
                 EmployeeDataGrid.Items.Refresh();
 
                 // Salvează în fișier
-                var updateCommand = new UpdateEmployeeCommand(_service);
+                var updateCommand = new UpdateEmployeeCommand(_service, _currentUser);
                 _commandInvoker.SetCommand(updateCommand);
                 _commandInvoker.ExecuteCommand(_selectedEmployeeForEdit); // Trimite angajatul editat
 
@@ -83,7 +98,7 @@ namespace HRM
             else
             {
                 // Folosește AddEmployeeCommand
-                var addCommand = new AddEmployeeCommand(_service, name, role, team);
+                var addCommand = new AddEmployeeCommand(_service, name, role, team, _currentUser);
                 _commandInvoker.SetCommand(addCommand);
                 _commandInvoker.ExecuteCommand(null);
             }
@@ -114,10 +129,20 @@ namespace HRM
         {
             if (EmployeeDataGrid.SelectedItem != null)
             {
-                // Afișează panoul de ștergere
-                InputPanel.Visibility = Visibility.Collapsed;
-                DeletePanel.Visibility = Visibility.Visible;
-                ShowAddButton.Visibility = Visibility.Collapsed;
+                // Permite meniul de ștergere doar pentru HR
+                if (_currentUser.Role == "HR")
+                {
+                    InputPanel.Visibility = Visibility.Collapsed;
+                    DeletePanel.Visibility = Visibility.Visible;
+                    ShowAddButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    // Pentru manageri sau alte roluri, nu afișa nimic
+                    EmployeeDataGrid.SelectedItem = null;
+                    DeletePanel.Visibility = Visibility.Collapsed;
+                    InputPanel.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -194,5 +219,15 @@ namespace HRM
             _commandInvoker.UndoLastCommand();
             EmployeeDataGrid.Items.Refresh();
         }
+        
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+{
+    // Deschide fereastra de login
+    var loginWindow = new LoginWindow();
+    loginWindow.Show();
+
+    // Închide fereastra curentă
+    this.Close();
+}
     }
 }

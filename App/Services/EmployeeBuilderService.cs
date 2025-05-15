@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Domain.Builders;
 using Domain.Entities;
 using Domain.Factories;
+using App.Abstraction;
 
 namespace App.Services
 {
-    public class EmployeeBuilderService
+    public class EmployeeBuilderService : IEmployeeBuilderService
     {
         public Employee BuildEmployee(string name, string role, string team)
         {

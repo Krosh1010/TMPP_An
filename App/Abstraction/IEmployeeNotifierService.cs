@@ -8,10 +8,10 @@ using Domain.Observers;
 
 namespace App.Abstraction
 {
-    public interface IEmployeeObservable
+    public interface IEmployeeNotifierService
     {
+        void NotifyObservers(string action, Employee employee);
         void RegisterObserver(IEmployeeObserver observer);
         void UnregisterObserver(IEmployeeObserver observer);
-        void NotifyObservers(string action, Employee employee);
     }
 }

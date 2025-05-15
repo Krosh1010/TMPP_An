@@ -17,18 +17,30 @@ namespace App.Services
     {
         private readonly IEmployeeRepository _repo;
         private readonly List<Employee> _employees;
-        private readonly EmployeeBuilderService _builderService;
-        private readonly EmployeeNotifierService _notifier;
+        private readonly IEmployeeBuilderService _builderService;
+        private readonly IEmployeeNotifierService _notifier;
+        private readonly IEmployeeAccessService _accessService;
+        private readonly INotificationService _notificationService;
 
-        public EmployeeAppService(IEmployeeRepository repo)
+        public EmployeeAppService(
+            IEmployeeRepository repo,
+            IEmployeeBuilderService builderService,
+             IEmployeeNotifierService notifier,
+            IEmployeeAccessService accessService,
+            INotificationService notificationService)
         {
             _repo = repo;
             _employees = _repo.LoadAll();
-            _builderService = new EmployeeBuilderService();
-            _notifier = new EmployeeNotifierService();
+            _builderService = builderService;
+            _notifier = notifier;
+            _accessService = accessService;
+            _notificationService = notificationService;
         }
 
-        public List<Employee> GetEmployees() => _employees;
+        public List<Employee> GetEmployeesForUser(User currentUser)
+        {
+            return _accessService.GetAccessibleEmployees(currentUser, _employees);
+        }
 
         public void AddEmployee(string name, string role, string team)
         {
@@ -37,7 +49,7 @@ namespace App.Services
             _repo.SaveAll(_employees);
 
             _notifier.NotifyObservers("Add", employee);
-            NotificationService.Instance.Notify("Angajat adăugat cu succes");
+            _notificationService.Notify("Angajat adăugat cu succes");
         }
 
         public void RemoveEmployee(Employee employee)
@@ -46,7 +58,7 @@ namespace App.Services
             _repo.SaveAll(_employees);
 
             _notifier.NotifyObservers("Remove", employee);
-            NotificationService.Instance.Notify("Angajat șters cu succes");
+            _notificationService.Notify("Angajat șters cu succes");
         }
 
         public void UpdateEmployee(Employee updatedEmployee)
@@ -61,7 +73,7 @@ namespace App.Services
             }
 
             _notifier.NotifyObservers("Edit", updatedEmployee);
-            NotificationService.Instance.Notify("Angajat editat cu succes");
+            _notificationService.Notify("Angajat editat cu succes");
         }
 
         public void RegisterObserver(IEmployeeObserver observer)

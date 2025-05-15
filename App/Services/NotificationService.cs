@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.Observers;
+using App.Abstraction;
 
 namespace App.Services
 {
-    public class NotificationService
+    public class NotificationService : INotificationService
     {
         private static NotificationService _instance;
         private readonly List<INotificationObserver> _observers = new();

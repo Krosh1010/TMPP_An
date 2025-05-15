@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Observers;
+using App.Abstraction;
 
 namespace App.Services
 {
-    public class EmployeeNotifierService
+    public class EmployeeNotifierService : IEmployeeNotifierService
     {
         private readonly List<IEmployeeObserver> _observers = new();
 

@@ -22,13 +22,15 @@
                 Grid.Row="0"/>
 
         <!-- Undo Button - Moved to top right and made smaller -->
-        <Button Content="Undo" 
-                Click="Undo_Click" 
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Width="60"
-                Margin="0,0,0,10"
-                Grid.Row="0"/>
+        <Button x:Name="UndoButton"
+        Content="Undo" 
+        Click="Undo_Click" 
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Width="80"
+        Height="30"
+        Margin="0,0,100,10"
+        Grid.Row="0"/>
 
         <!-- Panel cu câmpurile de input (inițial ascuns) -->
         <StackPanel x:Name="InputPanel" 
@@ -127,5 +129,13 @@
             Orientation="Vertical"
             Panel.ZIndex="999"
             IsHitTestVisible="False" />
+        <Button x:Name="LogoutButton"
+        Content="Logout"
+        Width="80"
+        Height="30"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Margin="0,0,10,0"
+        Click="LogoutButton_Click"/>
     </Grid>
 </Window>
