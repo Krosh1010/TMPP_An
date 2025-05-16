@@ -8,6 +8,7 @@ using App.Services;
 using Domain.Entities;
 using HRM.Observers;
 using Infrastructure.Observers;
+using App.Services.Filters;
 
 namespace HRM
 {
@@ -17,6 +18,7 @@ namespace HRM
         private ObservableCollection<Employee> _employeeList;
         private Employee _selectedEmployeeForEdit;
         private readonly CommandInvoker _commandInvoker = new CommandInvoker();
+        private readonly EmployeeFilterContext _filterContext = new EmployeeFilterContext();
 
         private User _currentUser;
         public MainWindow(User user)
@@ -42,7 +44,17 @@ namespace HRM
         {
         ShowAddButton.Visibility = Visibility.Collapsed;
         UndoButton.Visibility = Visibility.Collapsed;
-        }
+                // Păstrează doar opțiunea "Nume" în filtrare pentru manageri
+                var itemsToRemove = FilterTypeComboBox.Items
+                    .OfType<ComboBoxItem>()
+                    .Where(i => (string)i.Content != "Nume")
+                    .ToList();
+
+                foreach (var item in itemsToRemove)
+                    FilterTypeComboBox.Items.Remove(item);
+
+                FilterTypeComboBox.SelectedIndex = 0;
+            }
         }
 
         public void OnNotification(string message, bool isError = false)
@@ -62,6 +74,7 @@ namespace HRM
             InputPanel.Visibility = Visibility.Visible;
             DeletePanel.Visibility = Visibility.Collapsed;
             ShowAddButton.Visibility = Visibility.Collapsed;
+            FilterPanel.Visibility = Visibility.Collapsed;
             EmployeeDataGrid.SelectedItem = null;
             NameTextBox.Focus();
         }
@@ -109,6 +122,7 @@ namespace HRM
             TeamComboBox.SelectedIndex = -1;
             InputPanel.Visibility = Visibility.Collapsed;
             ShowAddButton.Visibility = Visibility.Visible;
+            FilterPanel.Visibility = Visibility.Visible;
 
             // Resetare buton
             ((Button)sender).Content = "Adaugă";
@@ -123,6 +137,7 @@ namespace HRM
             TeamComboBox.SelectedIndex = -1;
             InputPanel.Visibility = Visibility.Collapsed;
             ShowAddButton.Visibility = Visibility.Visible;
+            FilterPanel.Visibility = Visibility.Visible;
         }
 
         private void EmployeeDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -135,6 +150,7 @@ namespace HRM
                     InputPanel.Visibility = Visibility.Collapsed;
                     DeletePanel.Visibility = Visibility.Visible;
                     ShowAddButton.Visibility = Visibility.Collapsed;
+                    FilterPanel.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
@@ -151,6 +167,7 @@ namespace HRM
             EmployeeDataGrid.SelectedItem = null;
             DeletePanel.Visibility = Visibility.Collapsed;
             ShowAddButton.Visibility = Visibility.Visible;
+            FilterPanel.Visibility = Visibility.Visible;
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
@@ -165,6 +182,7 @@ namespace HRM
                 EmployeeDataGrid.SelectedItem = null;
                 DeletePanel.Visibility = Visibility.Collapsed;
                 ShowAddButton.Visibility = Visibility.Visible;
+                FilterPanel.Visibility = Visibility.Visible;
             }
         }
         private void Edit_Click(object sender, RoutedEventArgs e)
@@ -188,6 +206,7 @@ namespace HRM
             InputPanel.Visibility = Visibility.Visible;
             DeletePanel.Visibility = Visibility.Collapsed;
             ShowAddButton.Visibility = Visibility.Collapsed;
+            FilterPanel.Visibility = Visibility.Collapsed;
 
             // Schimbă textul butonului de adăugare
             ((Button)InputPanel.Children
@@ -221,13 +240,46 @@ namespace HRM
         }
         
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
-{
-    // Deschide fereastra de login
-    var loginWindow = new LoginWindow();
-    loginWindow.Show();
+        {
+             // Deschide fereastra de login
+                var loginWindow = new LoginWindow();
+                loginWindow.Show();
 
-    // Închide fereastra curentă
-    this.Close();
-}
+            // Închide fereastra curentă
+            this.Close();
+        }
+
+        private void FilterEmployees(string filterType, string criteria)
+        {
+            switch (filterType)
+            {
+                case "Nume":
+                    _filterContext.SetStrategy(new NameFilterStrategy());
+                    break;
+                case "Rol":
+                    _filterContext.SetStrategy(new RoleFilterStrategy());
+                    break;
+                case "Echipa":
+                    _filterContext.SetStrategy(new TeamFilterStrategy());
+                    break;
+                default:
+                    _filterContext.SetStrategy(null);
+                    break;
+            }
+
+            var filtered = _filterContext.Filter(_service.GetEmployeesForUser(_currentUser), criteria);
+            _employeeList.Clear();
+            foreach (var emp in filtered)
+                _employeeList.Add(emp);
+        }
+
+        private void FilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            string filterType = (FilterTypeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            string criteria = FilterTextBox.Text.Trim();
+            FilterEmployees(filterType, criteria);
+        }
     }
+
+         
 }

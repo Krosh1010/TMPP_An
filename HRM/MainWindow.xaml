@@ -19,6 +19,7 @@
                 Click="ShowAddButton_Click"
                 HorizontalAlignment="Left"
                 Width="120"
+                Height="30"
                 Grid.Row="0"/>
 
         <!-- Undo Button - Moved to top right and made smaller -->
@@ -137,5 +138,15 @@
         VerticalAlignment="Top"
         Margin="0,0,10,0"
         Click="LogoutButton_Click"/>
+
+        <StackPanel x:Name="FilterPanel" Orientation="Horizontal" Grid.Row="0" Margin="180,0,0,10">
+            <ComboBox x:Name="FilterTypeComboBox" Width="100" Height="30" SelectedIndex="0">
+                <ComboBoxItem x:Name="FilterByName" Content="Nume"/>
+                <ComboBoxItem x:Name="FilterByRole" Content="Rol"/>
+                <ComboBoxItem x:Name="FilterByTeam" Content="Echipa"/>
+            </ComboBox>
+            <TextBox x:Name="FilterTextBox" Width="150" Height="30" Margin="5,0,0,0"/>
+            <Button Content="Filtrează" Click="FilterButton_Click" Width="80" Height="30" Margin="5,0,0,0"/>
+        </StackPanel>
     </Grid>
 </Window>
