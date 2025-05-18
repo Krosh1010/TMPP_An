@@ -17,6 +17,7 @@ namespace HRM.ViewModels
         private readonly EmployeeFilterContext _filterContext = new EmployeeFilterContext();
         private readonly User _currentUser;
         private readonly WindowResizeService _resizeService;
+        private readonly Action _closeWindowAction;
 
 
 
@@ -27,6 +28,7 @@ namespace HRM.ViewModels
         public System.Windows.Input.ICommand UndoCommand { get; }
         public System.Windows.Input.ICommand FilterCommand { get; }
         public System.Windows.Input.ICommand LogoutCommand { get; }
+        public System.Windows.Input.ICommand CancelDeleteCommand { get; }
 
         private Employee _selectedEmployee;
         public Employee SelectedEmployee
@@ -49,10 +51,11 @@ namespace HRM.ViewModels
             set => SetProperty(ref _filterCriteria, value);
         }
 
-        public MainWindowViewModel(IEmployeeServices service, User currentUser)
+        public MainWindowViewModel(IEmployeeServices service, User currentUser, Action closeWindowAction)
         {
             _service = service;
             _currentUser = currentUser;
+            _closeWindowAction = closeWindowAction;
             EmployeeList = new ObservableCollection<Employee>(_service.GetEmployeesForUser(_currentUser));
 
             AddEmployeeCommand = new RelayCommand(AddEmployee);
@@ -61,8 +64,13 @@ namespace HRM.ViewModels
             UndoCommand = new RelayCommand(Undo);
             FilterCommand = new RelayCommand(FilterEmployees);
             LogoutCommand = new RelayCommand(Logout);
+            CancelDeleteCommand = new RelayCommand(CancelDelete);
         }
 
+        private void CancelDelete()
+        {
+        SelectedEmployee = null;
+        }   
         private void AddEmployee()
         {
             var addWindow = new AddEmployeeWindow();
@@ -130,25 +138,45 @@ namespace HRM.ViewModels
             RefreshEmployees();
         }
 
-        private void FilterEmployees()
+        public void FilterEmployees()
         {
+            var allEmployees = _service.GetEmployeesForUser(_currentUser);
+
+            // Dacă nu ai criteriu sau tip de filtru, afișează toți angajații
+            if (string.IsNullOrWhiteSpace(FilterType) || string.IsNullOrWhiteSpace(FilterCriteria))
+            {
+                EmployeeList.Clear();
+                foreach (var emp in allEmployees)
+                    EmployeeList.Add(emp);
+                return;
+            }
+
+            // Setează strategia de filtrare pe baza FilterType
+            IEmployeeFilterStrategy strategy = null;
+            IEnumerable<Employee> filtered = allEmployees;
+
             switch (FilterType)
             {
                 case "Nume":
-                    _filterContext.SetStrategy(new NameFilterStrategy());
+                    strategy = new NameFilterStrategy();
                     break;
                 case "Rol":
-                    _filterContext.SetStrategy(new RoleFilterStrategy());
+                    strategy = new RoleFilterStrategy();
                     break;
                 case "Echipa":
-                    _filterContext.SetStrategy(new TeamFilterStrategy());
-                    break;
-                default:
-                    _filterContext.SetStrategy(null);
+                    strategy = new TeamFilterStrategy();
+                    // Elimină angajații cu Team == null înainte de filtrare
+                    filtered = allEmployees.Where(e => e.Team != null);
                     break;
             }
+            _filterContext.SetStrategy(strategy);
 
-            var filtered = _filterContext.Filter(_service.GetEmployeesForUser(_currentUser), FilterCriteria);
+            if (strategy != null)
+            {
+                var safeCriteria = FilterCriteria ?? string.Empty;
+                filtered = _filterContext.Filter(filtered.ToList(), safeCriteria); // <-- adaugă .ToList()
+            }
+
             EmployeeList.Clear();
             foreach (var emp in filtered)
                 EmployeeList.Add(emp);
@@ -163,9 +191,12 @@ namespace HRM.ViewModels
 
         private void Logout()
         {
+            // Deschide fereastra de login dacă vrei
             var loginWindow = new LoginWindow();
             loginWindow.Show();
-            App.Current.MainWindow.Close();
+
+            // Închide fereastra curentă
+            _closeWindowAction?.Invoke();
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {

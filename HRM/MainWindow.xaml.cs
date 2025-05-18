@@ -53,9 +53,9 @@ namespace HRM
                 LogoutButton);
 
             if (_currentUser.Role != "HR")
-        {
-        ShowAddButton.Visibility = Visibility.Collapsed;
-        UndoButton.Visibility = Visibility.Collapsed;
+            {
+                ShowAddButton.Visibility = Visibility.Collapsed;
+                UndoButton.Visibility = Visibility.Collapsed;
                 // Păstrează doar opțiunea "Nume" în filtrare pentru manageri
                 var itemsToRemove = FilterTypeComboBox.Items
                     .OfType<ComboBoxItem>()
@@ -107,7 +107,7 @@ namespace HRM
                 // Permite meniul de ștergere doar pentru HR
                 if (_currentUser.Role == "HR")
                 {
-                    
+
                     DeletePanel.Visibility = Visibility.Visible;
                     ShowAddButton.Visibility = Visibility.Collapsed;
                     FilterPanel.Visibility = Visibility.Collapsed;
@@ -117,7 +117,7 @@ namespace HRM
                     // Pentru manageri sau alte roluri, nu afișa nimic
                     EmployeeDataGrid.SelectedItem = null;
                     DeletePanel.Visibility = Visibility.Collapsed;
-                    
+
                 }
             }
         }
@@ -191,12 +191,12 @@ namespace HRM
             _commandInvoker.UndoLastCommand();
             EmployeeDataGrid.Items.Refresh();
         }
-        
+
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-             // Deschide fereastra de login
-                var loginWindow = new LoginWindow();
-                loginWindow.Show();
+            // Deschide fereastra de login
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
 
             // Închide fereastra curentă
             this.Close();
@@ -220,7 +220,16 @@ namespace HRM
                     break;
             }
 
-            var filtered = _filterContext.Filter(_service.GetEmployeesForUser(_currentUser), criteria);
+            // Ia lista de angajați și setează Team la "Fără echipă" dacă e null
+            var employees = _service.GetEmployeesForUser(_currentUser)
+                .Select(emp =>
+                {
+                    if (emp.Team == null)
+                        emp.Team = "Fără echipă";
+                    return emp;
+                }).ToList();
+
+            var filtered = _filterContext.Filter(employees, criteria);
             _employeeList.Clear();
             foreach (var emp in filtered)
                 _employeeList.Add(emp);
@@ -241,6 +250,4 @@ namespace HRM
         }
 
     }
-
-
 }
