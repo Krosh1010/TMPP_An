@@ -31,6 +31,17 @@ namespace HRM
             TeamComboBox.SelectedItem = TeamComboBox.Items
                 .OfType<ComboBoxItem>()
                 .FirstOrDefault(i => (string)i.Content == employee.Team);
+
+            // Setează starea selectată
+            StateComboBox.SelectedItem = StateComboBox.Items
+                .Cast<ComboBoxItem>()
+                .FirstOrDefault(i => i.Content.ToString() == employee.StateName);
+        }
+
+        // Pune aici proprietatea:
+        public string EmployeeStateName
+        {
+            get { return (StateComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString(); }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)

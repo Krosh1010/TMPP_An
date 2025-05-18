@@ -5,10 +5,122 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HRM"
         mc:Ignorable="d"
-        Title="Employee Management" Height="450" Width="800">
+        Title="Employee Management" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5"
+        SizeChanged="Window_SizeChanged"
+        MinWidth="610">
     <Window.Resources>
         <local:TeamColumnConverter x:Key="TeamColumnConverter"/>
+
+        <!-- Modern Button Style -->
+        <Style TargetType="Button" x:Key="ModernButton">
+            <Setter Property="Background" Value="#4285F4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8 4"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="4" Opacity="0.2" ShadowDepth="2"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3367D6"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#2A56C6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Delete Button Style -->
+        <Style x:Key="DeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#F44336"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D32F2F"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Cancel Button Style -->
+        <Style x:Key="CancelButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#9E9E9E"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#757575"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGrid Style -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#FAFAFA"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0 10 0 0"/>
+            <Setter Property="VerticalGridLinesBrush" Value="#EEEEEE"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#EEEEEE"/>
+        </Style>
+
+        <!-- DataGridHeader Style -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#4285F4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="35"/>
+        </Style>
+
+        <!-- TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+
+        <!-- Panel Container Style -->
+        <Style TargetType="Border" x:Key="PanelContainerStyle">
+            <Setter Property="Background" Value="#E8F0FE"/>
+            <Setter Property="BorderBrush" Value="#D2E3FC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="0 0 0 10"/>
+        </Style>
+
+        <!-- Delete Panel Container Style -->
+        <Style TargetType="Border" x:Key="DeletePanelContainerStyle" BasedOn="{StaticResource PanelContainerStyle}">
+            <Setter Property="Background" Value="#FFF8E1"/>
+            <Setter Property="BorderBrush" Value="#FFE0B2"/>
+            <Setter Property="Margin" Value="0 10 0 10"/>
+        </Style>
     </Window.Resources>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,85 +128,163 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Buton principal pentru a afișa câmpurile -->
-        <Button x:Name="ShowAddButton" 
-                Content="Adaugă Persoană" 
-                Click="ShowAddButton_Click"
-                HorizontalAlignment="Left"
-                Width="120"
-                Height="30"
-                Grid.Row="0"/>
+        <!-- Header Area -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Undo Button - Moved to top right and made smaller -->
-        <Button x:Name="UndoButton"
-        Content="Undo" 
-        Click="Undo_Click" 
-        HorizontalAlignment="Right"
-        VerticalAlignment="Top"
-        Width="80"
-        Height="30"
-        Margin="0,0,100,10"
-        Grid.Row="0"/>
+            <!-- Title -->
+            <TextBlock x:Name="TitleText" 
+                      Text="Employee Management" 
+                      Grid.Column="0"
+                      FontSize="20" 
+                      FontWeight="Bold"
+                      VerticalAlignment="Center"
+                      Margin="0 0 10 0"
+                      MinWidth="150"/>
 
-        <!-- Panel pentru butonul de ștergere (inițial ascuns) -->
-        <StackPanel x:Name="DeletePanel"
-            Orientation="Horizontal"
-            Margin="0,-40,0,10"
-            Grid.Row="1"
-            Visibility="Collapsed">
-            <TextBlock Text="Alege Opțiunea" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <Button Content="Editează"
-            x:Name="EditButton"
-            Click="Edit_Click"
-            Margin="0,0,10,0"/>
-            <Button Content="Șterge"
-            Click="Delete_Click"
-            Margin="0,0,10,0"/>
-            <Button Content="Anulează"
-            Click="CancelDelete_Click"/>
-        </StackPanel>
+            <!-- Filter Panel -->
+            <Border x:Name="FilterPanel"
+                    Grid.Column="1"
+                    Style="{StaticResource PanelContainerStyle}" 
+                    HorizontalAlignment="Center"
+                    MinWidth="300"
+                    MaxWidth="800">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-        <!-- Lista angajaților -->
+                    <ComboBox x:Name="FilterTypeComboBox" 
+                              Grid.Column="0"
+                              MinWidth="80" 
+                              SelectedIndex="0" 
+                              Margin="0 0 5 0">
+                        <ComboBoxItem Content="Nume"/>
+                        <ComboBoxItem Content="Rol"/>
+                        <ComboBoxItem Content="Echipa"/>
+                    </ComboBox>
+
+                    <TextBox x:Name="FilterTextBox" 
+                             Grid.Column="1"
+                             MinWidth="120" 
+                             Margin="0 0 5 0"/>
+
+                    <Button Content="Filtru" 
+                            Grid.Column="2"
+                            Click="FilterButton_Click" 
+                            Style="{StaticResource ModernButton}"
+                            MinWidth="70"/>
+                </Grid>
+            </Border>
+
+            <!-- Action Buttons -->
+            <StackPanel x:Name="ActionButtonsPanel"
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                <Button x:Name="ShowAddButton" 
+                        Content="Adaugă" 
+                        Click="ShowAddButton_Click"
+                        Style="{StaticResource ModernButton}"
+                        MinWidth="80"
+                        Margin="0 0 5 0"
+                        ToolTip="Adaugă angajat nou"/>
+
+                <Button x:Name="UndoButton"
+                        Content="Undo" 
+                        Click="Undo_Click" 
+                        Style="{StaticResource ModernButton}"
+                        MinWidth="60"
+                        Margin="0 0 5 0"
+                        ToolTip="Anulează ultima acțiune"/>
+
+                <Button x:Name="LogoutButton"
+                        Content="Logout"
+                        Click="LogoutButton_Click"
+                        Style="{StaticResource ModernButton}"
+                        MinWidth="70"
+                        ToolTip="Ieșire din aplicație"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Delete Panel -->
+        <Border x:Name="DeletePanel" 
+        Grid.Row="1" 
+        Style="{StaticResource DeletePanelContainerStyle}"
+        Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Angajat selectat:" 
+                  VerticalAlignment="Center" 
+                  Margin="0 0 10 0"
+                  FontWeight="SemiBold"
+                  FontSize="14"/>
+
+                <!-- Buton Edit -->
+                <Button x:Name="EditButton"
+                Content="Modifică"
+                Click="Edit_Click"
+                Style="{StaticResource ModernButton}"
+                Margin="0 0 10 0"
+                Padding="12 6"
+                FontSize="14"
+                MinWidth="90"/>
+
+                <!-- Buton Delete -->
+                <Button x:Name="DeleteButton"
+                Content="Șterge"
+                Click="Delete_Click"
+                Style="{StaticResource DeleteButtonStyle}"
+                Margin="0 0 10 0"
+                Padding="12 6"
+                FontSize="14"
+                MinWidth="90"
+                Foreground="White"/>
+
+                <!-- Buton Cancel -->
+                <Button x:Name="CancelButton"
+                Content="Anulează"
+                Click="CancelDelete_Click"
+                Style="{StaticResource CancelButtonStyle}"
+                Margin="0"
+                Padding="12 6"
+                FontSize="14"
+                MinWidth="90"
+                Foreground="White"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Employee List -->
         <DataGrid x:Name="EmployeeDataGrid" 
-          Grid.Row="2"
-          AutoGenerateColumns="False"
-          CanUserAddRows="False"
-          SelectionMode="Single"
-          IsReadOnly="True"
-          SelectionChanged="EmployeeDataGrid_SelectionChanged"
-          Margin="0,10,0,0">
+                  Grid.Row="2"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  SelectionMode="Single"
+                  IsReadOnly="True"
+                  SelectionChanged="EmployeeDataGrid_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
                 <DataGridTextColumn Header="Team" Width="*" 
-                 Binding="{Binding ., Converter={StaticResource TeamColumnConverter}}"/>
+                                 Binding="{Binding ., Converter={StaticResource TeamColumnConverter}}"/>
                 <DataGridTextColumn Header="Hire Date" Binding="{Binding HireDate, StringFormat=d}" Width="*"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding StateName}" Width="120" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel x:Name="ToastContainer"
-            VerticalAlignment="Bottom"
-            HorizontalAlignment="Right"
-            Margin="10"
-            Orientation="Vertical"
-            Panel.ZIndex="999"
-            IsHitTestVisible="False" />
-        <Button x:Name="LogoutButton"
-        Content="Logout"
-        Width="80"
-        Height="30"
-        HorizontalAlignment="Right"
-        VerticalAlignment="Top"
-        Margin="0,0,10,0"
-        Click="LogoutButton_Click"/>
 
-        <StackPanel x:Name="FilterPanel" Orientation="Horizontal" Grid.Row="0" Margin="180,0,0,10">
-            <ComboBox x:Name="FilterTypeComboBox" Width="100" Height="30" SelectedIndex="0">
-                <ComboBoxItem x:Name="FilterByName" Content="Nume"/>
-                <ComboBoxItem x:Name="FilterByRole" Content="Rol"/>
-                <ComboBoxItem x:Name="FilterByTeam" Content="Echipa"/>
-            </ComboBox>
-            <TextBox x:Name="FilterTextBox" Width="150" Height="30" Margin="5,0,0,0"/>
-            <Button Content="Filtrează" Click="FilterButton_Click" Width="80" Height="30" Margin="5,0,0,0"/>
-        </StackPanel>
+        <!-- Toast Notifications -->
+        <StackPanel x:Name="ToastContainer"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    Margin="10"
+                    Orientation="Vertical"
+                    Panel.ZIndex="999"
+                    IsHitTestVisible="False"/>
     </Grid>
 </Window>

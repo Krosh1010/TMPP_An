@@ -6,19 +6,13 @@ using System.Threading.Tasks;
 
 namespace Domain.States
 {
-    public abstract class EmployeeState
+    public class ActiveState : IEmployeeState
     {
-        public abstract string Name { get; }
+        public string Name => "Activ";
     }
 
-    public class ActiveState : EmployeeState
+    public class OnVacationState : IEmployeeState
     {
-        public ActiveState() { }
-        public override string Name => "Activ";
-    }
-    public class OnVacationState : EmployeeState
-    {
-        public OnVacationState() { }
-        public override string Name => "În concediu";
+        public string Name => "În concediu";
     }
 }

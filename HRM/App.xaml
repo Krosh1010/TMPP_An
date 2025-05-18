@@ -4,6 +4,14 @@
              xmlns:local="clr-namespace:HRM"
              StartupUri="LoginWindow.xaml">
     <Application.Resources>
-         
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <DropShadowEffect x:Key="ShadowEffect" 
+                      BlurRadius="10" 
+                      Opacity="0.1" 
+                      ShadowDepth="3" 
+                      Color="#000000"/>
     </Application.Resources>
 </Application>

@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using App.Abstraction;
 using App.Services;
 using Domain.Entities;
+using Infrastructure.Repositories;
 
 namespace HRM
 {
@@ -36,16 +37,25 @@ namespace HRM
 
             if (authService.Login(username, password))
             {
-                var currentUser = authService.GetCurrentUser(); // obții userul
+                var currentUser = authService.GetCurrentUser();
 
-                // Transmiți userul mai departe
                 MainWindow main = new MainWindow(currentUser);
                 main.Show();
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Login failed!");
+                // Aici poți verifica dacă motivul e "concediu"
+                var managerRepo = new ManagerHrRepository();
+                var employee = managerRepo.LoadAll().FirstOrDefault(e => e.Name == username && e.Role == "Manager");
+                if (employee != null && employee.StateName == "În concediu")
+                {
+                    MessageBox.Show("Nu te poți loga: ești în concediu!");
+                }
+                else
+                {
+                    MessageBox.Show("Login failed!");
+                }
             }
         }
     }

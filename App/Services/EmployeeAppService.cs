@@ -68,9 +68,7 @@ namespace App.Services
 
         public void UpdateEmployee(Employee updatedEmployee)
         {
-            var index = _employees.FindIndex(emp =>
-                emp.HireDate == updatedEmployee.HireDate &&
-                emp.Name == updatedEmployee.Name);
+            var index = _employees.FindIndex(emp => emp.Id == updatedEmployee.Id);
             if (index >= 0)
             {
                 _employees[index] = updatedEmployee;

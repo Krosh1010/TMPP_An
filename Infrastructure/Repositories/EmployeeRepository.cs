@@ -42,13 +42,17 @@ namespace Infrastructure.Repositories
             // Reconstruim cu factory, în funcție de Role
             var reconstructed = rawList.Select(emp =>
             {
-                return emp.Role switch
+                Employee newEmp = emp.Role switch
                 {
                     "HR" => EmployeeFactory.CreateHR(emp.Name, emp.Team),
                     "Manager" => EmployeeFactory.CreateManager(emp.Name, emp.Team),
                     "Developer" => EmployeeFactory.CreateDeveloper(emp.Name, emp.Team),
                     _ => emp // fallback
                 };
+                newEmp.Id = emp.Id;
+                newEmp.HireDate = emp.HireDate;
+                newEmp.StateName = emp.StateName;
+                return newEmp;
             }).ToList();
 
             return reconstructed;

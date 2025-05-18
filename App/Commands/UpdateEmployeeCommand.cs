@@ -23,7 +23,7 @@ namespace App.Commands
         public void Execute(Employee employee)
         {
             _oldEmployee = _service.GetEmployeesForUser(_currentUser)
-                .FirstOrDefault(e => e.HireDate == employee.HireDate && e.Name == employee.Name);
+                .FirstOrDefault(e => e.Id == employee.Id);
 
             _newEmployee = employee;
 

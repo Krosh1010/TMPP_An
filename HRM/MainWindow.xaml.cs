@@ -10,6 +10,7 @@ using HRM.Observers;
 using Infrastructure.Observers;
 using App.Services.Filters;
 using Infrastructure.Repositories;
+using HRM.Services;
 
 namespace HRM
 {
@@ -20,6 +21,7 @@ namespace HRM
         private Employee _selectedEmployeeForEdit;
         private readonly CommandInvoker _commandInvoker = new CommandInvoker();
         private readonly EmployeeFilterContext _filterContext = new EmployeeFilterContext();
+        private readonly WindowResizeService _resizeService;
 
         private User _currentUser;
         public MainWindow(User user)
@@ -41,6 +43,14 @@ namespace HRM
             var uiUpdater = new EmployeeUIUpdater(_employeeList);
             _service.RegisterObserver(uiUpdater);
             NotificationService.Instance.Subscribe(this);
+
+            _resizeService = new WindowResizeService(
+                TitleText,
+                ActionButtonsPanel,
+                FilterPanel,
+                ShowAddButton,
+                UndoButton,
+                LogoutButton);
 
             if (_currentUser.Role != "HR")
         {
@@ -127,7 +137,8 @@ namespace HRM
                         Name = editWindow.EmployeeName,
                         Role = editWindow.EmployeeRole,
                         Team = editWindow.EmployeeTeam,
-                        HireDate = selected.HireDate
+                        HireDate = selected.HireDate,
+                        StateName = editWindow.EmployeeStateName
                     };
 
                     var editCommand = new UpdateEmployeeCommand(_service, _currentUser);
@@ -222,7 +233,14 @@ namespace HRM
             FilterEmployees(filterType, criteria);
         }
 
+        //Style
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _resizeService.HandleWindowResize(e);
+        }
+
     }
 
-         
+
 }
