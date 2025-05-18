@@ -13,16 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using App.Abstraction;
 using App.Services;
+using Domain.Entities;
 
 namespace HRM
 {
     public partial class LoginWindow : Window
     {
-        private readonly IAuthenticationService authService = new ProxyAuthenticationService();
+        
+        private IAuthenticationService authService;
 
         public LoginWindow()
         {
             InitializeComponent();
+            
             authService = new ProxyAuthenticationService();
         }
 

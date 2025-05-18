@@ -9,6 +9,6 @@ namespace App.Abstraction
 {
     public interface IEmployeeBuilderService
     {
-        Employee BuildEmployee(string name, string role, string team);
+        Employee BuildEmployee(string name, string role, string team, DateTime hireDate);
     }
 }

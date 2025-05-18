@@ -15,11 +15,12 @@ namespace Domain.Entities
         public string Team { get; set; }
         public DateTime HireDate { get; set; }
 
-        public Employee() {
+        public Employee()
+        {
             Id = Guid.NewGuid();
         }
 
-        public Employee(string name, string role,string team, DateTime hireDate)
+        public Employee(string name, string role, string team, DateTime hireDate)
         {
             Id = Guid.NewGuid();
             Name = name;

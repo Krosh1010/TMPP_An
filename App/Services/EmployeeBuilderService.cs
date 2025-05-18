@@ -12,13 +12,13 @@ namespace App.Services
 {
     public class EmployeeBuilderService : IEmployeeBuilderService
     {
-        public Employee BuildEmployee(string name, string role, string team)
+        public Employee BuildEmployee(string name, string role, string team, DateTime hireDate)
         {
             var builder = new EmployeeBuilder();
             builder.SetName(name);
             builder.SetRole(role);
             builder.SetTeam(team);
-            builder.SetHireDate(DateTime.Now);
+            builder.SetHireDate(hireDate);
             return builder.Build();
         }
     }

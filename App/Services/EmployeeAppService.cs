@@ -44,7 +44,7 @@ namespace App.Services
 
         public void AddEmployee(string name, string role, string team)
         {
-            var employee = _builderService.BuildEmployee(name, role, team);
+            var employee = _builderService.BuildEmployee(name, role, team, DateTime.Now);
             _employees.Add(employee);
             _repo.SaveAll(_employees);
 
