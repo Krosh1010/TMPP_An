@@ -25,8 +25,8 @@ namespace HRM
         public LoginWindow()
         {
             InitializeComponent();
-            
-            authService = new ProxyAuthenticationService();
+            var managerRepo = new ManagerHrRepositoryAdapter();
+            authService = new ProxyAuthenticationService(managerRepo);
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)

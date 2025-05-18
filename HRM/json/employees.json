@@ -1,0 +1,30 @@
+[
+  {
+    "Id": "8fe8ff47-94fc-4e3d-b247-40534099a05b",
+    "Name": "wfsdf",
+    "Role": "Manager",
+    "Team": "Tester",
+    "HireDate": "2025-05-18T16:11:31.3183229+03:00"
+  },
+  {
+    "Id": "315057eb-4450-4c69-8c8c-85b2dc140a48",
+    "Name": "ManagerF",
+    "Role": "Manager",
+    "Team": "Front",
+    "HireDate": "2025-05-18T16:11:31.3183788+03:00"
+  },
+  {
+    "Id": "5223de80-46ee-4e94-9420-47c816dbe5e3",
+    "Name": "ManagerB",
+    "Role": "Manager",
+    "Team": "Back",
+    "HireDate": "2025-05-18T16:11:31.3183818+03:00"
+  },
+  {
+    "Id": "2bc0a2ec-6000-4cff-afe8-3ed15d75c5ec",
+    "Name": "HR",
+    "Role": "HR",
+    "Team": null,
+    "HireDate": "2025-05-18T16:11:40.6579694+03:00"
+  }
+]

@@ -9,6 +9,7 @@ using Domain.Entities;
 using HRM.Observers;
 using Infrastructure.Observers;
 using App.Services.Filters;
+using Infrastructure.Repositories;
 
 namespace HRM
 {
@@ -30,7 +31,8 @@ namespace HRM
               new EmployeeBuilderService(),
             new EmployeeNotifierService(),
             new EmployeeAccessService(),
-            NotificationService.Instance
+            NotificationService.Instance,
+            new ManagerHrRepository()
     );
             _employeeList = new ObservableCollection<Employee>(_service.GetEmployeesForUser(_currentUser));
             EmployeeDataGrid.ItemsSource = _employeeList;

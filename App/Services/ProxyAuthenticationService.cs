@@ -13,9 +13,9 @@ namespace App.Services
         private readonly AuthenticationService realService;
         private bool isAuthenticated = false;
 
-        public ProxyAuthenticationService()
+        public ProxyAuthenticationService(IManagerHrRepository managerRepov)
         {
-            realService = new AuthenticationService();
+            realService = new AuthenticationService(managerRepov);
         }
 
         public bool Login(string username, string password)

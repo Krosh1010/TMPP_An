@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using App.Abstraction;
 using Domain.Entities;
 
@@ -13,21 +11,29 @@ namespace App.Services
         private List<User> users;
         private User currentUser;
 
-        public AuthenticationService()
+        public AuthenticationService(IManagerHrRepository managerRepo)
         {
-            // Exemplu hardcodat
-            users = new List<User>
-        {
-            new User { Username = "hr", Password = "123", Role = "HR" },
-            new User { Username = "managerB", Password = "456", Role = "Manager", Team = "Back" },
-            new User { Username = "managerF", Password = "456", Role = "Manager", Team = "Front" },
-            new User { Username = "managerT", Password = "456", Role = "Manager", Team = "Tester" }
-        };
+            users = new List<User>();
+
+            var persons = managerRepo.LoadAll();
+
+            foreach (var person in persons)
+            {
+                users.Add(new User
+                {
+                    Username = person.Name,
+                    Password = person.Role == "HR" ? "123" : "456", 
+                    Role = person.Role,
+                    Team = person.Team
+                });
+            }
         }
 
         public bool Login(string username, string password)
         {
-            var user = users.FirstOrDefault(u => u.Username == username && u.Password == password);
+            var user = users.FirstOrDefault(u =>
+                u.Username.Equals(username, StringComparison.Ordinal) &&
+                u.Password == password);
             if (user != null)
             {
                 currentUser = user;

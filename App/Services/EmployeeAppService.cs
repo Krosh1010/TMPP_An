@@ -21,13 +21,15 @@ namespace App.Services
         private readonly IEmployeeNotifierService _notifier;
         private readonly IEmployeeAccessService _accessService;
         private readonly INotificationService _notificationService;
+        private readonly ManagerHrRepository _managerHrRepo;
 
         public EmployeeAppService(
             IEmployeeRepository repo,
             IEmployeeBuilderService builderService,
              IEmployeeNotifierService notifier,
             IEmployeeAccessService accessService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ManagerHrRepository managerHrRepo)
         {
             _repo = repo;
             _employees = _repo.LoadAll();
@@ -35,6 +37,7 @@ namespace App.Services
             _notifier = notifier;
             _accessService = accessService;
             _notificationService = notificationService;
+            _managerHrRepo = managerHrRepo;
         }
 
         public List<Employee> GetEmployeesForUser(User currentUser)
@@ -47,6 +50,7 @@ namespace App.Services
             var employee = _builderService.BuildEmployee(name, role, team, DateTime.Now);
             _employees.Add(employee);
             _repo.SaveAll(_employees);
+            _managerHrRepo.SaveAll(_employees);
 
             _notifier.NotifyObservers("Add", employee);
             _notificationService.Notify("Angajat adăugat cu succes");
@@ -56,6 +60,7 @@ namespace App.Services
         {
             _employees.Remove(employee);
             _repo.SaveAll(_employees);
+            _managerHrRepo.SaveAll(_employees);
 
             _notifier.NotifyObservers("Remove", employee);
             _notificationService.Notify("Angajat șters cu succes");
@@ -70,6 +75,7 @@ namespace App.Services
             {
                 _employees[index] = updatedEmployee;
                 _repo.SaveAll(_employees);
+                _managerHrRepo.SaveAll(_employees);
             }
 
             _notifier.NotifyObservers("Edit", updatedEmployee);
