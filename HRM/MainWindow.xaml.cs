@@ -5,6 +5,8 @@ using System.Windows.Media;
 using App.Abstraction;
 using App.Commands;
 using App.Services;
+using App.Messages;
+using App.Services.Mediator;
 using Domain.Entities;
 using HRM.Observers;
 using Infrastructure.Observers;
@@ -22,6 +24,7 @@ namespace HRM
         private readonly CommandInvoker _commandInvoker = new CommandInvoker();
         private readonly EmployeeFilterContext _filterContext = new EmployeeFilterContext();
         private readonly WindowResizeService _resizeService;
+        
 
         private User _currentUser;
         public MainWindow(User user)
@@ -36,6 +39,9 @@ namespace HRM
             NotificationService.Instance,
             new ManagerHrRepository()
     );
+            MediatorProvider.Instance.Subscribe<EmployeeAddedMessage>(OnEmployeeAdded);
+            MediatorProvider.Instance.Subscribe<EmployeeEditedMessage>(OnEmployeeEdited);
+            MediatorProvider.Instance.Subscribe<EmployeeDeletedMessage>(OnEmployeeDeleted);
             _employeeList = new ObservableCollection<Employee>(_service.GetEmployeesForUser(_currentUser));
             EmployeeDataGrid.ItemsSource = _employeeList;
             var logger = new EmployeeLogger();
@@ -51,6 +57,7 @@ namespace HRM
                 ShowAddButton,
                 UndoButton,
                 LogoutButton);
+
 
             if (_currentUser.Role != "HR")
             {
@@ -79,6 +86,9 @@ namespace HRM
         {
             NotificationService.Instance.Unsubscribe(this);
             base.OnClosed(e);
+            MediatorProvider.Instance.Unsubscribe<EmployeeAddedMessage>(OnEmployeeAdded);
+            MediatorProvider.Instance.Unsubscribe<EmployeeEditedMessage>(OnEmployeeEdited);
+            MediatorProvider.Instance.Unsubscribe<EmployeeDeletedMessage>(OnEmployeeDeleted);
         }
 
         private void ShowAddButton_Click(object sender, RoutedEventArgs e)
@@ -240,6 +250,30 @@ namespace HRM
             string filterType = (FilterTypeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
             string criteria = FilterTextBox.Text.Trim();
             FilterEmployees(filterType, criteria);
+        }
+
+        private void OnEmployeeAdded(EmployeeAddedMessage msg)
+        {
+            if (!_employeeList.Any(e => e.Id == msg.Employee.Id))
+                _employeeList.Add(msg.Employee);
+        }
+
+        private void OnEmployeeEdited(EmployeeEditedMessage msg)
+        {
+            var existing = _employeeList.FirstOrDefault(e => e.Id == msg.Employee.Id);
+            if (existing != null)
+            {
+                var index = _employeeList.IndexOf(existing);
+                _employeeList[index] = msg.Employee;
+                EmployeeDataGrid.Items.Refresh();
+            }
+        }
+
+        private void OnEmployeeDeleted(EmployeeDeletedMessage msg)
+        {
+            var toRemove = _employeeList.FirstOrDefault(e => e.Id == msg.Employee.Id);
+            if (toRemove != null)
+                _employeeList.Remove(toRemove);
         }
 
         //Style

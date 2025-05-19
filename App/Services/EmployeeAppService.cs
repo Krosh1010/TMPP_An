@@ -10,6 +10,8 @@ using Infrastructure.Repositories;
 using Domain.Observers;
 using App.Abstraction;
 using System.Collections.ObjectModel;
+using App.Messages;
+using App.Services.Mediator;
 
 namespace App.Services
 {
@@ -54,6 +56,8 @@ namespace App.Services
 
             _notifier.NotifyObservers("Add", employee);
             _notificationService.Notify("Angajat adăugat cu succes");
+            // Publică mesajul prin mediator
+            MediatorProvider.Instance.Publish(new EmployeeAddedMessage(employee));
         }
 
         public void RemoveEmployee(Employee employee)
@@ -64,6 +68,9 @@ namespace App.Services
 
             _notifier.NotifyObservers("Remove", employee);
             _notificationService.Notify("Angajat șters cu succes");
+            // Publică mesajul prin mediator
+            MediatorProvider.Instance.Publish(new EmployeeDeletedMessage(employee));
+
         }
 
         public void UpdateEmployee(Employee updatedEmployee)
@@ -78,6 +85,8 @@ namespace App.Services
 
             _notifier.NotifyObservers("Edit", updatedEmployee);
             _notificationService.Notify("Angajat editat cu succes");
+            // Publică mesajul prin mediator
+            MediatorProvider.Instance.Publish(new EmployeeEditedMessage(updatedEmployee));
         }
 
         public void RegisterObserver(IEmployeeObserver observer)
