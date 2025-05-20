@@ -27,7 +27,8 @@ namespace HRM
         {
             InitializeComponent();
             var managerRepo = new ManagerHrRepositoryAdapter();
-            authService = new ProxyAuthenticationService(managerRepo);
+            var proxy = new ProxyAuthenticationService(managerRepo);
+            authService = new LoggingAuthenticationServiceDecorator(proxy);
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
